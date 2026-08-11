@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>緻養 Luxe Nurture｜客戶管理系統</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jsQR/1.4.0/jsQR.js"></script>
+<style>
+:root{
+  --bg:#16140f;
+  --panel:#1e1b15;
+  --panel-2:#252119;
+  --line: rgba(198,161,91,0.18);
+  --line-strong: rgba(198,161,91,0.4);
+  --text:#ece5d8;
+  --text-dim:#a79c89;
+  --gold:#c6a15b;
+  --gold-soft: rgba(198,161,91,0.12);
+  --ok:#7c9070;
+  --warn:#b5482f;
+  --radius:3px;
+  font-size:16px;
+}
+*{box-sizing:border-box;}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:"PingFang TC","Microsoft JhengHei","Noto Sans TC",sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+.app{max-width:1000px;margin:0 auto;padding:0 0 60px;}
+.brandbar{padding:34px 20px 20px;text-align:center;border-bottom:1px solid var(--line);margin-bottom:6px;}
+.brand-mark{font-size:11px;letter-spacing:0.35em;color:var(--gold);text-transform:uppercase;}
+.brand-title{font-family:"Songti TC","PMingLiU",serif;font-size:30px;letter-spacing:0.12em;margin:8px 0 4px;color:var(--text);}
+.brand-sub{font-size:12px;color:var(--text-dim);letter-spacing:0.08em;}
+.tabs{display:flex;gap:2px;padding:14px 16px 0;overflow-x:auto;scrollbar-width:none;}
+.tabs::-webkit-scrollbar{display:none;}
+.tab-btn{flex:0 0 auto;padding:10px 16px;background:transparent;border:1px solid transparent;border-bottom:none;color:var(--text-dim);font-size:13.5px;letter-spacing:0.04em;cursor:pointer;border-radius:var(--radius) var(--radius) 0 0;white-space:nowrap;}
+.tab-btn.active{color:var(--gold);background:var(--panel);border-color:var(--line-strong);}
+.tabpanel{display:none;padding:18px 16px 0;}
+.tabpanel.active{display:block;}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:18px;margin-bottom:14px;}
+.card-title{font-size:13px;letter-spacing:0.06em;color:var(--gold);margin:0 0 14px;text-transform:uppercase;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+.row{display:flex;gap:10px;flex-wrap:wrap;}
+.btn{appearance:none;border:1px solid var(--line-strong);background:transparent;color:var(--text);padding:9px 16px;font-size:13.5px;letter-spacing:0.03em;border-radius:var(--radius);cursor:pointer;transition:.15s;}
+.btn:hover{border-color:var(--gold);color:var(--gold);}
+.btn-gold{background:var(--gold);color:#1a1710;border-color:var(--gold);font-weight:600;}
+.btn-gold:hover{background:#d6b370;color:#1a1710;}
+.btn-gold:disabled{opacity:.35;cursor:not-allowed;}
+.btn-danger{border-color:var(--warn);color:var(--warn);}
+.btn-danger:hover{background:var(--warn);color:#fff;}
+.btn-sm{padding:8px 12px;font-size:12.5px;min-height:36px;}
+input,select,textarea{width:100%;background:var(--panel-2);border:1px solid var(--line);color:var(--text);padding:10px 10px;border-radius:var(--radius);font-size:16px;font-family:inherit;}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold);}
+label{font-size:12px;color:var(--text-dim);display:block;margin-bottom:4px;letter-spacing:.03em;}
+.field{margin-bottom:12px;}
+table{width:100%;border-collapse:collapse;font-size:13.5px;}
+th{text-align:left;color:var(--text-dim);font-weight:500;font-size:11.5px;letter-spacing:.05em;text-transform:uppercase;padding:8px 8px;border-bottom:1px solid var(--line-strong);}
+td{padding:10px 8px;border-bottom:1px solid var(--line);vertical-align:top;}
+tr:last-child td{border-bottom:none;}
+.muted{color:var(--text-dim);}
+.gold{color:var(--gold);}
+.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;border:1px solid var(--line-strong);}
+.badge-warn{color:var(--warn);border-color:var(--warn);}
+.badge-ok{color:var(--ok);border-color:var(--ok);}
+.empty{text-align:center;color:var(--text-dim);padding:30px 10px;font-size:13px;}
+.overlay{position:fixed;inset:0;background:rgba(10,9,6,.7);display:none;align-items:center;justify-content:center;z-index:50;padding:16px;}
+.overlay.active{display:flex;}
+.modal{background:var(--panel);border:1px solid var(--line-strong);border-radius:var(--radius);width:100%;max-width:440px;padding:22px;max-height:88vh;overflow-y:auto;}
+.modal h3{margin:0 0 16px;font-size:15px;color:var(--gold);letter-spacing:.04em;}
+.modal-close{float:right;background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:16px;}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--panel-2);border:1px solid var(--line-strong);color:var(--text);padding:12px 20px;border-radius:var(--radius);font-size:13.5px;opacity:0;transition:.2s;z-index:99;pointer-events:none;text-align:center;max-width:90vw;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.toast.err{border-color:var(--warn);color:#ffb3a1;}
+.toast.ok{border-color:var(--ok);color:#c8dcbc;}
+.step-label{font-size:11px;letter-spacing:.08em;color:var(--gold);text-transform:uppercase;margin-bottom:8px;}
+.customer-hit{padding:10px 12px;border:1px solid var(--line);border-radius:var(--radius);cursor:pointer;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;}
+.customer-hit:hover{border-color:var(--gold);}
+.selected-card{border:1px solid var(--gold);background:var(--gold-soft);border-radius:var(--radius);padding:14px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:flex-start;}
+.tx-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:8px;}
+.tx-pick{border:1px solid var(--line);border-radius:var(--radius);padding:12px;cursor:pointer;text-align:left;background:transparent;color:var(--text);}
+.tx-pick:hover{border-color:var(--gold);}
+.tx-pick.sel{border-color:var(--gold);background:var(--gold-soft);}
+.tx-pick .p{color:var(--gold);font-size:13px;margin-top:4px;}
+.tx-pick .l{font-size:11px;color:var(--text-dim);}
+.summary-line{display:flex;justify-content:space-between;padding:6px 0;font-size:13.5px;border-bottom:1px solid var(--line);gap:12px;}
+.summary-line:last-child{border-bottom:none;font-weight:600;color:var(--gold);}
+.qr-box{display:flex;justify-content:center;padding:14px;background:#fff;border-radius:var(--radius);margin:10px 0;}
+.consumable-row{display:flex;gap:8px;align-items:flex-end;margin-bottom:8px;}
+.consumable-row select{flex:2;}
+.consumable-row input{flex:1;}
+.consumable-row button{flex:0 0 auto;}
+.tier-row{display:flex;gap:8px;align-items:flex-end;margin-bottom:8px;}
+.tier-row input{flex:1;}
+.tier-row button{flex:0 0 auto;}
+.tier-chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line-strong);border-radius:20px;padding:3px 10px 3px 12px;font-size:12px;margin:2px 4px 2px 0;}
+.tier-chip button{background:none;border:none;color:var(--text-dim);cursor:pointer;font-size:12px;padding:0;}
+.stat-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px;}
+.stat-box{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:14px;text-align:center;}
+.stat-box .v{font-size:20px;color:var(--gold);font-family:"Songti TC",serif;}
+.stat-box .l{font-size:11px;color:var(--text-dim);margin-top:4px;letter-spacing:.04em;}
+#customerTableWrap,#inventoryTableWrap,#treatmentTableWrap,#recordTableWrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+#customerTableWrap table{min-width:600px;}
+#inventoryTableWrap table{min-width:520px;}
+#treatmentTableWrap table{min-width:560px;}
+#recordTableWrap table{min-width:560px;}
+.tab-btn{min-height:40px;}
+.btn{min-height:40px;}
+@media(max-width:520px){
+  .stat-strip{grid-template-columns:1fr;}
+  .consumable-row,.tier-row{flex-wrap:wrap;}
+  .consumable-row select,.consumable-row input,.tier-row input{flex:1 1 100%;}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="brandbar">
+    <div class="brand-mark">Luxe Nurture</div>
+    <div class="brand-title">緻 養</div>
+    <div class="brand-sub">客戶管理系統 · 庫存 · 成本 · 耗材</div>
+  </div>
+
+  <div class="tabs" id="tabs">
+    <button class="tab-btn" data-tab="checkout">掃描結算</button>
+    <button class="tab-btn" data-tab="customers">客戶管理</button>
+    <button class="tab-btn" data-tab="inventory">庫存管理</button>
+    <button class="tab-btn" data-tab="treatments">療程 / QR設定</button>
+    <button class="tab-btn" data-tab="records">消費紀錄</button>
+  </div>
+
+  <!-- CHECKOUT -->
+  <section class="tabpanel" id="panel-checkout">
+    <div class="card">
+      <div class="card-title">Step 1 · 選擇客戶</div>
+      <div class="field"><label>搜尋姓名 / 電話</label><input type="text" id="customerSearch" placeholder="輸入姓名或電話"></div>
+      <div id="searchResults"></div>
+      <div id="selectedCustomerBox"></div>
+    </div>
+
+    <div class="card" id="treatmentStepCard" style="display:none;">
+      <div class="card-title">Step 2 · 掃療程 QR Code（或手動點選）</div>
+      <div class="field">
+        <label>拍攝 / 上傳價目表上的療程 QR Code</label>
+        <input type="file" accept="image/*" capture="environment" id="qrFileInput">
+      </div>
+      <div class="tx-grid" id="treatmentGrid"></div>
+    </div>
+
+    <div class="card" id="confirmStepCard" style="display:none;">
+      <div class="card-title">Step 3 · 確認扣款 / 扣庫存</div>
+      <div id="confirmSummary"></div>
+      <div class="row" style="margin-top:14px;">
+        <button class="btn-gold btn" id="btnConfirmCheckout" style="flex:1;">確認完成，扣庫存並記錄消費</button>
+        <button class="btn btn-sm" id="btnResetCheckout">重新開始</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- CUSTOMERS -->
+  <section class="tabpanel" id="panel-customers">
+    <div class="stat-strip">
+      <div class="stat-box"><div class="v" id="statCustomerCount">0</div><div class="l">客戶總數</div></div>
+      <div class="stat-box"><div class="v" id="statTotalRevenue">$0</div><div class="l">累計消費總額</div></div>
+      <div class="stat-box"><div class="v" id="statTotalVisits">0</div><div class="l">累計服務次數</div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">客戶名單 <button class="btn btn-gold btn-sm" id="btnAddCustomer">+ 新增客戶</button></div>
+      <div id="customerTableWrap"></div>
+    </div>
+  </section>
+
+  <!-- INVENTORY -->
+  <section class="tabpanel" id="panel-inventory">
+    <div class="card">
+      <div class="card-title">耗材庫存 <button class="btn btn-gold btn-sm" id="btnAddInventory">+ 新增品項</button></div>
+      <div id="inventoryTableWrap"></div>
+    </div>
+  </section>
+
+  <!-- TREATMENTS -->
+  <section class="tabpanel" id="panel-treatments">
+    <div class="card">
+      <div class="card-title">療程 / 價目表
+        <span class="row" style="gap:6px;">
+          <button class="btn btn-sm" id="btnReloadTreatments">重新讀取</button>
+          <button class="btn btn-sm" id="btnRestoreDefaults">還原預設價目表</button>
+          <button class="btn btn-gold btn-sm" id="btnAddTreatment">+ 新增療程</button>
+        </span>
+      </div>
+      <p class="muted" style="font-size:12.5px;margin-top:-6px;">每個療程可設多個價位（例：體驗價 / 單堂價格），每個價位各自有一組 QR Code，印在價目表上，結帳時掃這組 QR 就會自動選好療程與價格、扣庫存、算毛利。</p>
+      <div id="treatmentTableWrap"></div>
+    </div>
+  </section>
+
+  <!-- RECORDS -->
+  <section class="tabpanel" id="panel-records">
+    <div class="card">
+      <div class="card-title">消費紀錄</div>
+      <div class="row" style="margin-bottom:12px;">
+        <input type="text" id="recordSearch" placeholder="搜尋客戶姓名" style="max-width:260px;">
+      </div>
+      <div class="stat-strip">
+        <div class="stat-box"><div class="v" id="recRevenue">$0</div><div class="l">篩選後營收</div></div>
+        <div class="stat-box"><div class="v" id="recCost">$0</div><div class="l">篩選後耗材成本</div></div>
+        <div class="stat-box"><div class="v" id="recMargin">$0</div><div class="l">篩選後毛利</div></div>
+      </div>
+      <div id="recordTableWrap"></div>
+    </div>
+  </section>
+</div>
+
+<div class="overlay" id="modalOverlay"><div class="modal" id="modalBody"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ---------- state ---------- */
+let state = { customers: [], inventory: [], treatments: [], transactions: [] };
+let checkoutState = { customer: null, treatment: null, tier: null };
+
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+const fmt = n => '$' + Math.round(n).toLocaleString('en-US');
+const todayStr = () => {
+  const d = new Date();
+  return d.getFullYear() + '/' + String(d.getMonth()+1).padStart(2,'0') + '/' + String(d.getDate()).padStart(2,'0');
+};
+
+function toast(msg, type){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (type ? ' ' + type : '');
+  clearTimeout(t._h);
+  t._h = setTimeout(()=>{ t.className = 'toast'; }, 2800);
+}
+
+/* ---------- storage ---------- */
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbz65LNg_JuzwuLN3AyXmiEmPB2QhNymCOAvy-vcs7ZjkbsfXZW5mzPKSBZZOZENR86t/exec';
+
+let storageAvailable = true;
+
+function withTimeout(promise, ms){
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => setTimeout(()=> reject(new Error('timeout')), ms))
+  ]);
+}
+
+async function gasGet(key){
+  const res = await fetch(GAS_URL + '?key=' + encodeURIComponent(key));
+  if(!res.ok) throw new Error('HTTP ' + res.status);
+  return res.json();
+}
+
+async function gasSet(key, value){
+  const res = await fetch(GAS_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+    body: JSON.stringify({ key, value })
+  });
+  if(!res.ok) throw new Error('HTTP ' + res.status);
+  return res.json();
+}
+
+async function checkStorage(){
+  try{
+    await withTimeout(gasGet('__ping__'), 5000);
+    return true;
+  }catch(e){
+    return false;
+  }
+}
+
+function showStorageWarning(){
+  if(document.getElementById('storageWarnBar')) return;
+  const bar = document.createElement('div');
+  bar.id = 'storageWarnBar';
+  bar.style.cssText = 'background:#3a1f16;color:#ffb3a1;border-bottom:1px solid var(--warn);padding:10px 16px;font-size:12.5px;text-align:center;';
+  bar.textContent = '⚠️ 連不到 Google Sheet，資料只會保留在這次畫面，重新整理或關閉就會消失。請檢查網路，或確認 Apps Script 部署的存取權限是「所有人」。';
+  document.body.insertBefore(bar, document.body.firstChild);
+}
+
+async function loadAll(){
+  storageAvailable = await checkStorage();
+  if(!storageAvailable){
+    showStorageWarning();
+    seedStarterData();
+    return;
+  }
+  const keys = ['customers','inventory','treatments','transactions'];
+  const results = await Promise.all(keys.map(k => getKeyWithRetry(k)));
+  keys.forEach((k, idx) => { state[k] = results[idx]; });
+  if(state.inventory.length === 0 && state.treatments.length === 0 && state.customers.length === 0){
+    seedStarterData();
+    await Promise.all([saveKey('inventory'), saveKey('treatments')]);
+  }
+}
+
+async function getKeyWithRetry(key, attempts){
+  attempts = attempts || 2;
+  for(let i=0; i<attempts; i++){
+    try{
+      const r = await withTimeout(gasGet(key), 5000);
+      return (r && r.value) ? JSON.parse(r.value) : [];
+    }catch(e){
+      if(i < attempts-1) await new Promise(res=>setTimeout(res, 300));
+    }
+  }
+  return [];
+}
+
+async function reloadFromStorage(){
+  if(!storageAvailable){ toast('目前沒有連上 Google Sheet，無法重新讀取', 'err'); return; }
+  const keys = ['customers','inventory','treatments','transactions'];
+  const results = await Promise.all(keys.map(k => getKeyWithRetry(k, 3)));
+  keys.forEach((k, idx) => { state[k] = results[idx]; });
+  renderCustomers(); renderInventory(); renderTreatments(); renderRecords(); renderCheckout();
+  toast('✅ 已重新讀取 Google Sheet 資料');
+}
+
+async function saveKey(key){
+  if(!storageAvailable) return;
+  try{
+    const res = await withTimeout(gasSet(key, JSON.stringify(state[key])), 6000);
+    if(!res || !res.ok) toast('儲存失敗，請重試', 'err');
+  }catch(e){
+    toast('儲存失敗：' + (e.message || e), 'err');
+  }
+}
+
+function seedStarterData(){
+  const invWaterjet = uid();   // 水飛梭溶液：3罐，一罐300元/400ml → 0.75元/ml
+  const invExo = uid();        // 外泌體：$1800/瓶
+  const invMask = uid();       // 面膜：$35/片
+  const invMisc = uid();       // 零星耗材：$20/客
+  state.inventory.push(
+    { id: invWaterjet, name: '水飛梭溶液', unit: 'ml', stock: 1200, costPerUnit: 0.75, lowStock: 200 },
+    { id: invExo, name: '外泌體', unit: '瓶', stock: 20, costPerUnit: 1800, lowStock: 5 },
+    { id: invMask, name: '面膜', unit: '片', stock: 50, costPerUnit: 35, lowStock: 10 },
+    { id: invMisc, name: '零星耗材', unit: '客', stock: 999, costPerUnit: 20, lowStock: 20 }
+  );
+  state.treatments.push(
+    {
+      id: uid(), name: '臉部基礎保養',
+      consumables: [{ inventoryId: invWaterjet, qty: 70 }, { inventoryId: invMask, qty: 1 }, { inventoryId: invMisc, qty: 1 }],
+      tiers: [
+        { id: uid(), label: '體驗價', price: 899 },
+        { id: uid(), label: '單堂價格', price: 1500 }
+      ]
+    },
+    {
+      id: uid(), name: '臉部無創水光靚白保濕',
+      consumables: [{ inventoryId: invWaterjet, qty: 70 }, { inventoryId: invMask, qty: 1 }, { inventoryId: invMisc, qty: 1 }],
+      tiers: [
+        { id: uid(), label: '體驗價', price: 2500 },
+        { id: uid(), label: '單堂價格', price: 3800 }
+      ]
+    },
+    {
+      id: uid(), name: '臉部無創水光外泌體（店長推薦）',
+      consumables: [{ inventoryId: invWaterjet, qty: 70 }, { inventoryId: invExo, qty: 1 }, { inventoryId: invMask, qty: 1 }, { inventoryId: invMisc, qty: 1 }],
+      tiers: [
+        { id: uid(), label: '體驗價', price: 3800 },
+        { id: uid(), label: '單堂價格', price: 5800 }
+      ]
+    },
+    {
+      id: uid(), name: '頭部外泌體保養',
+      consumables: [{ inventoryId: invExo, qty: 1 }, { inventoryId: invMisc, qty: 1 }],
+      tiers: [
+        { id: uid(), label: '體驗價', price: 2500 },
+        { id: uid(), label: '單堂價格', price: 5000 }
+      ]
+    },
+    {
+      id: uid(), name: '居家外泌體加購（臉/頭髮）',
+      consumables: [{ inventoryId: invExo, qty: 1 }],
+      tiers: [ { id: uid(), label: '加購價', price: 2000 } ]
+    }
+  );
+}
+
+/* ---------- tabs ---------- */
+document.getElementById('tabs').addEventListener('click', e=>{
+  const btn = e.target.closest('.tab-btn');
+  if(!btn) return;
+  switchTab(btn.dataset.tab);
+});
+function switchTab(name){
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
+  document.querySelectorAll('.tabpanel').forEach(p => p.classList.toggle('active', p.id === 'panel-' + name));
+  if(name === 'customers') renderCustomers();
+  if(name === 'inventory') renderInventory();
+  if(name === 'treatments') renderTreatments();
+  if(name === 'records') renderRecords();
+  if(name === 'checkout') renderCheckout();
+}
+
+/* ---------- modal helpers ---------- */
+function openModal(html){
+  document.getElementById('modalBody').innerHTML = html;
+  document.getElementById('modalOverlay').classList.add('active');
+}
+function closeModal(){
+  document.getElementById('modalOverlay').classList.remove('active');
+}
+document.getElementById('modalOverlay').addEventListener('click', e=>{
+  if(e.target.id === 'modalOverlay') closeModal();
+});
+
+/* ================= CUSTOMERS ================= */
+function renderCustomers(){
+  document.getElementById('statCustomerCount').textContent = state.customers.length;
+  const revenue = state.customers.reduce((s,c)=>s+(c.totalSpent||0),0);
+  const visits = state.customers.reduce((s,c)=>s+(c.visits||0),0);
+  document.getElementById('statTotalRevenue').textContent = fmt(revenue);
+  document.getElementById('statTotalVisits').textContent = visits;
+
+  const wrap = document.getElementById('customerTableWrap');
+  if(state.customers.length === 0){
+    wrap.innerHTML = '<div class="empty">還沒有客戶資料，點右上角新增</div>';
+    return;
+  }
+  let rows = state.customers
+    .slice()
+    .sort((a,b)=>(b.createdAt||0)-(a.createdAt||0))
+    .map(c => `
+      <tr>
+        <td>${escapeHtml(c.name)}</td>
+        <td class="muted">${escapeHtml(c.phone||'-')}</td>
+        <td>${c.visits||0}</td>
+        <td class="gold">${fmt(c.totalSpent||0)}</td>
+        <td class="muted">${c.lastVisit||'-'}</td>
+        <td class="row" style="gap:6px;">
+          <button class="btn btn-sm" data-edit-c="${c.id}">編輯</button>
+          <button class="btn btn-sm btn-danger" data-del-c="${c.id}">刪除</button>
+        </td>
+      </tr>`).join('');
+  wrap.innerHTML = `<table><thead><tr><th>姓名</th><th>電話</th><th>次數</th><th>累計消費</th><th>上次到店</th><th>操作</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+document.getElementById('btnAddCustomer').addEventListener('click', ()=> openCustomerForm());
+
+function openCustomerForm(existing){
+  const c = existing || { name:'', phone:'', notes:'' };
+  openModal(`
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <h3>${existing ? '編輯客戶' : '新增客戶'}</h3>
+    <div class="field"><label>姓名</label><input id="fName" value="${existing?escapeHtml(c.name):''}"></div>
+    <div class="field"><label>電話</label><input id="fPhone" value="${existing?escapeHtml(c.phone||''):''}"></div>
+    <div class="field"><label>備註（膚況 / 過敏史等）</label><textarea id="fNotes" rows="3">${existing?escapeHtml(c.notes||''):''}</textarea></div>
+    <button class="btn btn-gold" style="width:100%;" id="fSave">${existing?'儲存':'新增客戶'}</button>
+  `);
+  document.getElementById('fSave').addEventListener('click', async ()=>{
+    const name = document.getElementById('fName').value.trim();
+    if(!name){ toast('請輸入姓名','err'); return; }
+    const phone = document.getElementById('fPhone').value.trim();
+    const notes = document.getElementById('fNotes').value.trim();
+    if(existing){
+      Object.assign(existing, { name, phone, notes });
+    } else {
+      state.customers.push({ id: uid(), name, phone, notes, visits:0, totalSpent:0, lastVisit:null, createdAt: Date.now() });
+    }
+    await saveKey('customers');
+    closeModal();
+    renderCustomers();
+    toast('✅ 已儲存');
+  });
+}
+
+document.getElementById('customerTableWrap').addEventListener('click', e=>{
+  const ed = e.target.closest('[data-edit-c]');
+  const del = e.target.closest('[data-del-c]');
+  if(ed) openCustomerForm(state.customers.find(c=>c.id===ed.dataset.editC));
+  if(del) confirmDeleteCustomer(del.dataset.delC);
+});
+
+function confirmDeleteCustomer(id){
+  const c = state.customers.find(c=>c.id===id);
+  openModal(`
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <h3>刪除客戶</h3>
+    <p>確定要刪除「${escapeHtml(c.name)}」嗎？此動作無法復原（消費紀錄會保留）。</p>
+    <div class="row"><button class="btn btn-danger" id="doDel" style="flex:1;">確定刪除</button><button class="btn" onclick="closeModal()" style="flex:1;">取消</button></div>
+  `);
+  document.getElementById('doDel').addEventListener('click', async ()=>{
+    state.customers = state.customers.filter(c=>c.id!==id);
+    await saveKey('customers');
+    closeModal();
+    renderCustomers();
+    toast('已刪除');
+  });
+}
+
+/* ================= INVENTORY ================= */
+function renderInventory(){
+  const wrap = document.getElementById('inventoryTableWrap');
+  if(state.inventory.length===0){
+    wrap.innerHTML = '<div class="empty">還沒有庫存品項，點右上角新增</div>';
+    return;
+  }
+  let rows = state.inventory.map(i=>{
+    const low = i.stock <= (i.lowStock||0);
+    return `<tr>
+      <td>${escapeHtml(i.name)}</td>
+      <td class="muted">${i.unit}</td>
+      <td>${i.stock} ${low?'<span class="badge badge-warn">低庫存</span>':''}</td>
+      <td class="muted">${fmt(i.costPerUnit)}/${i.unit}</td>
+      <td class="row" style="gap:6px;">
+        <button class="btn btn-sm" data-restock="${i.id}">補貨</button>
+        <button class="btn btn-sm" data-edit-i="${i.id}">編輯</button>
+        <button class="btn btn-sm btn-danger" data-del-i="${i.id}">刪除</button>
+      </td>
+    </tr>`;
+  }).join('');
+  wrap.innerHTML = `<table><thead><tr><th>品項</th><th>單位</th><th>庫存</th><th>單位成本</th><th>操作</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+document.getElementById('btnAddInventory').addEventListener('click', ()=>openInventoryForm());
+
+function openInventoryForm(existing){
+  const i = existing || { name:'', unit:'', stock:0, costPerUnit:0, lowStock:0 };
+  openModal(`
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <h3>${existing?'編輯庫存品項':'新增庫存品項'}</h3>
+    <div class="field"><label>品項名稱</label><input id="iName" value="${existing?escapeHtml(i.name):''}"></div>
+    <div class="row">
+      <div class="field" style="flex:1;"><label>單位（ml/組/劑…）</label><input id="iUnit" value="${existing?escapeHtml(i.unit):''}"></div>
+      <div class="field" style="flex:1;"><label>目前庫存</label><input id="iStock" type="number" value="${existing?i.stock:0}"></div>
+    </div>
+    <div class="row">
+      <div class="field" style="flex:1;"><label>單位成本 (NT$)</label><input id="iCost" type="number" value="${existing?i.costPerUnit:0}"></div>
+      <div class="field" style="flex:1;"><label>低庫存警示線</label><input id="iLow" type="number" value="${existing?(i.lowStock||0):0}"></div>
+    </div>
+    <button class="btn btn-gold" style="width:100%;" id="iSave">儲存</button>
+  `);
+  document.getElementById('iSave').addEventListener('click', async ()=>{
+    const name = document.getElementById('iName').value.trim();
+    if(!name){ toast('請輸入品項名稱','err'); return; }
+    const unit = document.getElementById('iUnit').value.trim() || '份';
+    const stock = parseFloat(document.getElementById('iStock').value) || 0;
+    const costPerUnit = parseFloat(document.getElementById('iCost').value) || 0;
+    const lowStock = parseFloat(document.getElementById('iLow').value) || 0;
+    if(existing){
+      Object.assign(existing, { name, unit, stock, costPerUnit, lowStock });
+    } else {
+      state.inventory.push({ id: uid(), name, unit, stock, costPerUnit, lowStock });
+    }
+    await saveKey('inventory');
+    closeModal();
+    renderInventory();
+    toast('✅ 已儲存');
+  });
+}
+
+document.getElementById('inventoryTableWrap').addEventListener('click', e=>{
+  const re = e.target.closest('[data-restock]');
+  const ed = e.target.closest('[data-edit-i]');
+  const del = e.target.closest('[data-del-i]');
+  if(re) openRestock(re.dataset.restock);
+  if(ed) openInventoryForm(state.inventory.find(i=>i.id===ed.dataset.editI));
+  if(del) deleteInventory(del.dataset.delI);
+});
+
+function openRestock(id){
+  const item = state.inventory.find(i=>i.id===id);
+  openModal(`
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <h3>補貨：${escapeHtml(item.name)}</h3>
+    <p class="muted">目前庫存：${item.stock} ${item.unit}</p>
+    <div class="field"><label>本次補貨數量</label><input id="rQty" type="number" value="0"></div>
+    <button class="btn btn-gold" style="width:100%;" id="rSave">確認補貨</button>
+  `);
+  document.getElementById('rSave').addEventListener('click', async ()=>{
+    const qty = parseFloat(document.getElementById('rQty').value) || 0;
+    item.stock += qty;
+    await saveKey('inventory');
+    closeModal();
+    renderInventory();
+    toast('✅ 已補貨 ' + qty + ' ' + item.unit);
+  });
+}
+
+function deleteInventory(id){
+  const used = state.treatments.some(t => t.consumables.some(c=>c.inventoryId===id));
+  openModal(`
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <h3>刪除庫存品項</h3>
+    <p>${used ? '⚠️ 此品項已被療程使用，刪除後該療程將無法自動扣此耗材。' : '確定要刪除此品項嗎？'}</p>
+    <div class="row"><button class="btn btn-danger" id="doDel" style="flex:1;">確定刪除</button><button class="btn" onclick="closeModal()" style="flex:1;">取消</button></div>
+  `);
+  document.getElementById('doDel').addEventListener('click', async ()=>{
+    state.inventory = state.inventory.filter(i=>i.id!==id);
+    await saveKey('inventory');
+    closeModal();
+    renderInventory();
+    toast('已刪除');
+  });
+}
+
+/* ================= TREATMENTS ================= */
+function renderTreatments(){
+  const wrap = document.getElementById('treatmentTableWrap');
+  if(state.treatments.length===0){
+    wrap.innerHTML = '<div class="empty">還沒有療程項目，點右上角新增</div>';
+    return;
+  }
+  let rows = state.treatments.map(t=>{
+    const cost = treatmentCost(t);
+    const items = t.consumables.map(c=>{
+      const inv = state.inventory.find(i=>i.id===c.inventoryId);
+      return inv ? `${inv.name} x${c.qty}` : '（品項已刪除）';
+    }).join('、') || '無耗材';
+    const tierRows = t.tiers.map(tier=>{
+      const margin = tier.price - cost;
+      return `<div class="summary-line" style="border:none;padding:3px 0;">
+        <span>${escapeHtml(tier.label)} ${fmt(tier.price)}　<span class="muted">毛利 ${fmt(margin)}</span></span>
+        <button class="btn btn-sm" data-qr="${t.id}" data-tier="${tier.id}">QR</button>
+      </div>`;
+    }).join('');
+    return `<tr>
+      <td style="min-width:180px;">
+        <div>${escapeHtml(t.name)}</div>
+        <div class="muted" style="font-size:11.5px;margin-top:2px;">耗材：${items}</div>
+        <div class="muted" style="font-size:11.5px;">耗材成本：${fmt(cost)}</div>
+      </td>
+      <td style="min-width:200px;">${tierRows}</td>
+      <td class="row" style="gap:6px;">
+        <button class="btn btn-sm" data-edit-t="${t.id}">編輯</button>
+        <button class="btn btn-sm btn-danger" data-del-t="${t.id}">刪除</button>
+      </td>
+    </tr>`;
+  }).join('');
+  wrap.innerHTML = `<table><thead><tr><th>療程</th><th>價位 / QR</th><th>操作</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+function treatmentCost(t){
+  return t.consumables.reduce((sum,c)=>{
+    const inv = state.inventory.find(i=>i.id===c.inventoryId);
+    return sum + (inv ? inv.costPerUnit * c.qty : 0);
+  }, 0);
+}
+
+document.getElementById('btnAddTreatment').addEventListener('click', ()=>openTreatmentForm());
+document.getElementById('btnReloadTreatments').addEventListener('click', reloadFromStorage);
+document.getElementById('btnRestoreDefaults').addEventListener('click', restoreDefaultMenu);
+
+function restoreDefaultMenu(){
+  openModal(`
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <h3>還原預設價目表</h3>
+    <p>會把 5 個療程（臉部基礎保養／臉部無創水光靚白保濕／臉部無創水光外泌體／頭部外泌體保養／居家外泌體加購）跟對應的庫存品項（水飛梭溶液、外泌體、面膜、零星耗材）重新加進去並存到雲端。</p>
+    <p class="muted" style="font-size:12px;">已存在的客戶與消費紀錄不會受影響。若庫存品項名稱跟預設重複，會變成兩筆，之後可以自行刪除多的。</p>
+    <div class="row"><button class="btn btn-gold" id="doRestore" style="flex:1;">確定還原並存檔</button><button class="btn" onclick="closeModal()" style="flex:1;">取消</button></div>
+  `);
+  document.getElementById('doRestore').addEventListener('click', async ()=>{
+    seedStarterData();
+    await Promise.all([saveKey('inventory'), saveKey('treatments')]);
+    closeModal();
+    renderTreatments();
+    toast('✅ 已還原並存到雲端');
+  });
+}
+
+function openTreatmentForm(existing){
+  const t = existing || { name:'', consumables:[], tiers:[] };
+  const rowsHtml = (t.consumables.length?t.consumables:[{inventoryId:'',qty:1}])
+    .map(c=>consumableRowHtml(c)).join('');
+  const tiersHtml = (t.tiers.length?t.tiers:[{id:uid(),label:'單堂價格',price:0}])
+    .map(tier=>tierRowHtml(tier)).join('');
+  openModal(`
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <h3>${existing?'編輯療程':'新增療程'}</h3>
+    <div class="field"><label>療程名稱</label><input id="tName" value="${existing?escapeHtml(t.name):''}"></div>
+
+    <label>價位（例：體驗價 / 單堂價格）</label>
+    <div id="tierRows">${tiersHtml}</div>
+    <button class="btn btn-sm" id="addTierRow" style="margin-bottom:14px;">+ 加一個價位</button>
+
+    <label>使用耗材</label>
+    <div id="consumableRows">${rowsHtml}</div>
+    <button class="btn btn-sm" id="addConsumableRow" style="margin-bottom:14px;">+ 加一項耗材</button>
+
+    <button class="btn btn-gold" style="width:100%;" id="tSave">儲存</button>
+  `);
+  document.getElementById('addTierRow').addEventListener('click', ()=>{
+    document.getElementById('tierRows').insertAdjacentHTML('beforeend', tierRowHtml({id:uid(),label:'',price:0}));
+  });
+  document.getElementById('tierRows').addEventListener('click', e=>{
+    const rm = e.target.closest('[data-rm-tier]');
+    if(rm) rm.closest('.tier-row').remove();
+  });
+  document.getElementById('addConsumableRow').addEventListener('click', ()=>{
+    document.getElementById('consumableRows').insertAdjacentHTML('beforeend', consumableRowHtml({inventoryId:'',qty:1}));
+  });
+  document.getElementById('consumableRows').addEventListener('click', e=>{
+    const rm = e.target.closest('[data-rm-row]');
+    if(rm) rm.closest('.consumable-row').remove();
+  });
+  document.getElementById('tSave').addEventListener('click', async ()=>{
+    const name = document.getElementById('tName').value.trim();
+    if(!name){ toast('請輸入療程名稱','err'); return; }
+    const tiers = [...document.querySelectorAll('#tierRows .tier-row')]
+      .map(r=>({
+        id: r.dataset.tierId,
+        label: r.querySelector('.tLabel').value.trim(),
+        price: parseFloat(r.querySelector('.tPrice').value) || 0
+      }))
+      .filter(tier=>tier.label);
+    if(tiers.length===0){ toast('至少要有一個價位','err'); return; }
+    const consumables = [...document.querySelectorAll('#consumableRows .consumable-row')]
+      .map(r=>({
+        inventoryId: r.querySelector('.cInv').value,
+        qty: parseFloat(r.querySelector('.cQty').value) || 0
+      }))
+      .filter(c=>c.inventoryId && c.qty>0);
+    if(existing){
+      Object.assign(existing, { name, consumables, tiers });
+    } else {
+      state.treatments.push({ id: uid(), name, consumables, tiers });
+    }
+    await saveKey('treatments');
+    closeModal();
+    renderTreatments();
+    toast('✅ 已儲存');
+  });
+}
+
+function tierRowHtml(tier){
+  return `<div class="tier-row" data-tier-id="${tier.id||uid()}">
+    <input class="tLabel" placeholder="價位名稱（例：體驗價）" value="${escapeHtml(tier.label||'')}">
+    <input class="tPrice" type="number" placeholder="價格" value="${tier.price||0}">
+    <button class="btn btn-sm btn-danger" data-rm-tier>✕</button>
+  </div>`;
+}
+
+function consumableRowHtml(c){
+  const opts = state.inventory.map(i=>`<option value="${i.id}" ${c.inventoryId===i.id?'selected':''}>${escapeHtml(i.name)}（${i.unit}）</option>`).join('');
+  return `<div class="consumable-row">
+    <select class="cInv"><option value="">選擇庫存品項</option>${opts}</select>
+    <input class="cQty" type="number" step="any" placeholder="用量" value="${c.qty||1}">
+    <button class="btn btn-sm btn-danger" data-rm-row>✕</button>
+  </div>`;
+}
+
+document.getElementById('treatmentTableWrap').addEventListener('click', e=>{
+  const ed = e.target.closest('[data-edit-t]');
+  const del = e.target.closest('[data-del-t]');
+  const qr = e.target.closest('[data-qr]');
+  if(ed) openTreatmentForm(state.treatments.find(t=>t.id===ed.dataset.editT));
+  if(del) deleteTreatment(del.dataset.delT);
+  if(qr) showTreatmentQr(qr.dataset.qr, qr.dataset.tier);
+});
+
+function showTreatmentQr(treatmentId, tierId){
+  const t = state.treatments.find(t=>t.id===treatmentId);
+  const tier = t.tiers.find(ti=>ti.id===tierId);
+  if(!t || !tier) return;
+  openModal(`
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <h3>${escapeHtml(t.name)} · ${escapeHtml(tier.label)}</h3>
+    <div class="qr-box" id="qrRender"></div>
+    <p class="muted" style="font-size:12px;text-align:center;">${fmt(tier.price)}　·　印在價目表上，結帳掃這組即可</p>
+  `);
+  new QRCode(document.getElementById('qrRender'), {
+    text: 'LUXE-TX:' + t.id + ':' + tier.id,
+    width: 200, height: 200,
+    colorDark:'#16140f', colorLight:'#ffffff'
+  });
+}
+
+function deleteTreatment(id){
+  openModal(`
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <h3>刪除療程</h3>
+    <p>確定要刪除此療程嗎？</p>
+    <div class="row"><button class="btn btn-danger" id="doDel" style="flex:1;">確定刪除</button><button class="btn" onclick="closeModal()" style="flex:1;">取消</button></div>
+  `);
+  document.getElementById('doDel').addEventListener('click', async ()=>{
+    state.treatments = state.treatments.filter(t=>t.id!==id);
+    await saveKey('treatments');
+    closeModal();
+    renderTreatments();
+    toast('已刪除');
+  });
+}
+
+/* ================= CHECKOUT ================= */
+function renderCheckout(){
+  checkoutState = { customer: null, treatment: null, tier: null };
+  document.getElementById('searchResults').innerHTML = '';
+  document.getElementById('selectedCustomerBox').innerHTML = '';
+  document.getElementById('customerSearch').value = '';
+  document.getElementById('treatmentStepCard').style.display = 'none';
+  document.getElementById('confirmStepCard').style.display = 'none';
+}
+
+document.getElementById('customerSearch').addEventListener('input', e=>{
+  const q = e.target.value.trim().toLowerCase();
+  const box = document.getElementById('searchResults');
+  if(!q){ box.innerHTML=''; return; }
+  const hits = state.customers.filter(c =>
+    c.name.toLowerCase().includes(q) || (c.phone||'').includes(q)
+  ).slice(0,6);
+  box.innerHTML = hits.map(c=>`
+    <div class="customer-hit" data-pick="${c.id}">
+      <span>${escapeHtml(c.name)} <span class="muted">${escapeHtml(c.phone||'')}</span></span>
+      <span class="muted" style="font-size:12px;">${c.visits||0} 次 · ${fmt(c.totalSpent||0)}</span>
+    </div>`).join('') || '<div class="muted" style="font-size:12.5px;">找不到符合的客戶</div>';
+});
+document.getElementById('searchResults').addEventListener('click', e=>{
+  const pick = e.target.closest('[data-pick]');
+  if(pick) selectCustomerForCheckout(pick.dataset.pick);
+});
+
+document.getElementById('qrFileInput').addEventListener('change', e=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ev=>{
+    const img = new Image();
+    img.onload = ()=>{
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width; canvas.height = img.height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img,0,0);
+      const data = ctx.getImageData(0,0,canvas.width,canvas.height);
+      const code = window.jsQR ? jsQR(data.data, canvas.width, canvas.height) : null;
+      if(code && code.data && code.data.startsWith('LUXE-TX:')){
+        const parts = code.data.replace('LUXE-TX:','').split(':');
+        const tId = parts[0], tierId = parts[1];
+        const t = state.treatments.find(t=>t.id===tId);
+        const tier = t && t.tiers.find(ti=>ti.id===tierId);
+        if(t && tier){
+          pickTreatmentTier(t, tier);
+          toast('✅ 已辨識療程：' + t.name + '（' + tier.label + '）');
+        } else {
+          toast('找不到這個療程，可能已被刪除或修改','err');
+        }
+      } else {
+        toast('無法辨識 QR Code，請重新拍攝或改用下方手動點選','err');
+      }
+    };
+    img.src = ev.target.result;
+  };
+  reader.readAsDataURL(file);
+  e.target.value = '';
+});
+
+function selectCustomerForCheckout(id){
+  const c = state.customers.find(c=>c.id===id);
+  if(!c) return;
+  checkoutState.customer = c;
+  checkoutState.treatment = null;
+  checkoutState.tier = null;
+  document.getElementById('searchResults').innerHTML = '';
+  document.getElementById('customerSearch').value = '';
+  document.getElementById('selectedCustomerBox').innerHTML = `
+    <div class="selected-card">
+      <div>
+        <div style="font-size:15px;">${escapeHtml(c.name)}</div>
+        <div class="muted" style="font-size:12.5px;margin-top:2px;">${escapeHtml(c.phone||'')} · 到店 ${c.visits||0} 次 · 累計 ${fmt(c.totalSpent||0)}</div>
+        ${c.notes ? `<div class="muted" style="font-size:12px;margin-top:4px;">備註：${escapeHtml(c.notes)}</div>` : ''}
+      </div>
+      <button class="btn btn-sm" onclick="renderCheckout()">換人</button>
+    </div>`;
+  document.getElementById('treatmentStepCard').style.display = 'block';
+  document.getElementById('confirmStepCard').style.display = 'none';
+  renderTreatmentGrid();
+}
+
+function renderTreatmentGrid(){
+  const grid = document.getElementById('treatmentGrid');
+  if(state.treatments.length===0){
+    grid.innerHTML = '<div class="empty">尚未設定療程，請先到「療程 / QR設定」新增</div>';
+    return;
+  }
+  let html = '';
+  state.treatments.forEach(t=>{
+    t.tiers.forEach(tier=>{
+      const sel = checkoutState.treatment && checkoutState.treatment.id===t.id && checkoutState.tier && checkoutState.tier.id===tier.id;
+      html += `<button class="tx-pick ${sel?'sel':''}" data-pick-t="${t.id}" data-pick-tier="${tier.id}">
+        <div>${escapeHtml(t.name)}</div>
+        <div class="l">${escapeHtml(tier.label)}</div>
+        <div class="p">${fmt(tier.price)}</div>
+      </button>`;
+    });
+  });
+  grid.innerHTML = html;
+}
+document.getElementById('treatmentGrid').addEventListener('click', e=>{
+  const btn = e.target.closest('[data-pick-t]');
+  if(!btn) return;
+  const t = state.treatments.find(t=>t.id===btn.dataset.pickT);
+  const tier = t.tiers.find(ti=>ti.id===btn.dataset.pickTier);
+  pickTreatmentTier(t, tier);
+});
+
+function pickTreatmentTier(t, tier){
+  checkoutState.treatment = t;
+  checkoutState.tier = tier;
+  renderTreatmentGrid();
+  renderConfirmStep();
+}
+
+function renderConfirmStep(){
+  const { customer, treatment, tier } = checkoutState;
+  if(!customer || !treatment || !tier) return;
+  const card = document.getElementById('confirmStepCard');
+  card.style.display = 'block';
+  // default overrides = recipe qty (可依實際用量微調，例如水飛梭溶液每人 60-80ml 不等)
+  checkoutState.overrides = {};
+  treatment.consumables.forEach(c=>{ checkoutState.overrides[c.inventoryId] = c.qty; });
+
+  const lines = treatment.consumables.map(c=>{
+    const inv = state.inventory.find(i=>i.id===c.inventoryId);
+    if(!inv) return `<div class="summary-line"><span class="muted">（品項已刪除）</span><span></span></div>`;
+    return `<div class="summary-line" data-line-for="${inv.id}">
+      <span>${escapeHtml(inv.name)}
+        <input type="number" step="any" class="qtyOverride" data-inv="${inv.id}" value="${c.qty}"
+          style="width:76px;display:inline-block;padding:6px 8px;font-size:16px;margin-left:4px;">
+        ${inv.unit}
+      </span>
+      <span class="qtyOverrideNote" data-note-for="${inv.id}"></span>
+    </div>`;
+  }).join('');
+
+  document.getElementById('confirmSummary').innerHTML = `
+    <div class="summary-line"><span>客戶</span><span>${escapeHtml(customer.name)}</span></div>
+    <div class="summary-line"><span>療程</span><span>${escapeHtml(treatment.name)}（${escapeHtml(tier.label)}）</span></div>
+    <div class="summary-line"><span>售價</span><span>${fmt(tier.price)}</span></div>
+    <p class="muted" style="font-size:11.5px;margin:2px 0 6px;">實際用量可微調（例如水飛梭溶液依當次用量 60-80ml 修改）：</p>
+    ${lines}
+    <div class="summary-line" id="lineCost"><span>耗材成本</span><span></span></div>
+    <div class="summary-line" id="lineMargin"><span>毛利</span><span></span></div>
+  `;
+  document.querySelectorAll('.qtyOverride').forEach(inp=>{
+    inp.addEventListener('input', ()=>{
+      checkoutState.overrides[inp.dataset.inv] = parseFloat(inp.value) || 0;
+      recomputeConfirmTotals();
+    });
+  });
+  recomputeConfirmTotals();
+}
+
+function recomputeConfirmTotals(){
+  const { treatment, tier, overrides } = checkoutState;
+  if(!treatment || !tier) return;
+  let cost = 0;
+  let anyShortage = false;
+  treatment.consumables.forEach(c=>{
+    const inv = state.inventory.find(i=>i.id===c.inventoryId);
+    if(!inv) return;
+    const qty = overrides[inv.id] ?? c.qty;
+    cost += inv.costPerUnit * qty;
+    const after = inv.stock - qty;
+    const shortage = after < 0;
+    if(shortage) anyShortage = true;
+    const note = document.querySelector(`.qtyOverrideNote[data-note-for="${inv.id}"]`);
+    if(note){
+      note.className = 'qtyOverrideNote ' + (shortage ? '' : 'muted');
+      note.style.color = shortage ? 'var(--warn)' : '';
+      note.textContent = `庫存 ${inv.stock} → ${after}${shortage ? ' ⚠️不足' : ''}`;
+    }
+  });
+  const margin = tier.price - cost;
+  document.querySelector('#lineCost span:last-child').textContent = fmt(cost);
+  document.querySelector('#lineMargin span:last-child').textContent = fmt(margin);
+  document.getElementById('btnConfirmCheckout').textContent = anyShortage
+    ? '⚠️ 庫存不足，仍要扣款完成？'
+    : '確認完成，扣庫存並記錄消費';
+}
+
+document.getElementById('btnResetCheckout').addEventListener('click', renderCheckout);
+
+document.getElementById('btnConfirmCheckout').addEventListener('click', async ()=>{
+  const { customer, treatment, tier, overrides } = checkoutState;
+  if(!customer || !treatment || !tier) return;
+  let cost = 0;
+  treatment.consumables.forEach(c=>{
+    const inv = state.inventory.find(i=>i.id===c.inventoryId);
+    if(!inv) return;
+    const qty = overrides[inv.id] ?? c.qty;
+    cost += inv.costPerUnit * qty;
+    inv.stock -= qty;
+  });
+  customer.visits = (customer.visits||0) + 1;
+  customer.totalSpent = (customer.totalSpent||0) + tier.price;
+  customer.lastVisit = todayStr();
+  state.transactions.push({
+    id: uid(),
+    customerId: customer.id,
+    customerName: customer.name,
+    treatmentId: treatment.id,
+    treatmentName: treatment.name + '（' + tier.label + '）',
+    price: tier.price,
+    cost,
+    margin: tier.price - cost,
+    date: todayStr(),
+    ts: Date.now()
+  });
+  await Promise.all([saveKey('inventory'), saveKey('customers'), saveKey('transactions')]);
+  toast('🎉 已完成扣款、扣庫存並記錄消費');
+  renderCheckout();
+});
+
+/* ================= RECORDS ================= */
+function renderRecords(){
+  const q = (document.getElementById('recordSearch').value || '').trim().toLowerCase();
+  const list = state.transactions
+    .filter(t => !q || t.customerName.toLowerCase().includes(q))
+    .sort((a,b)=>b.ts-a.ts);
+  const revenue = list.reduce((s,t)=>s+t.price,0);
+  const cost = list.reduce((s,t)=>s+t.cost,0);
+  document.getElementById('recRevenue').textContent = fmt(revenue);
+  document.getElementById('recCost').textContent = fmt(cost);
+  document.getElementById('recMargin').textContent = fmt(revenue-cost);
+
+  const wrap = document.getElementById('recordTableWrap');
+  if(list.length===0){
+    wrap.innerHTML = '<div class="empty">尚無消費紀錄</div>';
+    return;
+  }
+  wrap.innerHTML = `<table><thead><tr><th>日期</th><th>客戶</th><th>療程</th><th>售價</th><th>成本</th><th>毛利</th></tr></thead><tbody>
+    ${list.map(t=>`<tr>
+      <td class="muted">${t.date}</td>
+      <td>${escapeHtml(t.customerName)}</td>
+      <td>${escapeHtml(t.treatmentName)}</td>
+      <td class="gold">${fmt(t.price)}</td>
+      <td class="muted">${fmt(t.cost)}</td>
+      <td>${fmt(t.margin)}</td>
+    </tr>`).join('')}
+  </tbody></table>`;
+}
+document.getElementById('recordSearch').addEventListener('input', renderRecords);
+
+/* ---------- utils ---------- */
+function escapeHtml(s){
+  return String(s ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+
+/* ---------- init ---------- */
+(async function init(){
+  try{
+    await loadAll();
+  }catch(e){
+    storageAvailable = false;
+    showStorageWarning();
+    if(state.customers.length===0 && state.inventory.length===0 && state.treatments.length===0){
+      seedStarterData();
+    }
+  }
+  switchTab('checkout');
+})();
+</script>
+</body>
+</html>
