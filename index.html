@@ -299,26 +299,26 @@ async function loadAll(){
 }
 
 async function getKeyDetailed(key, attempts){
-  attempts = attempts || 2;
+  attempts = attempts || 3;
   for(let i=0; i<attempts; i++){
     try{
-      const r = await withTimeout(gasGet(key), 5000);
+      const r = await withTimeout(gasGet(key), 9000);
       return { ok: true, value: (r && r.value) ? JSON.parse(r.value) : [] };
     }catch(e){
-      if(i < attempts-1) await new Promise(res=>setTimeout(res, 300));
+      if(i < attempts-1) await new Promise(res=>setTimeout(res, 500));
     }
   }
   return { ok: false, value: [] };
 }
 
 async function getKeyWithRetry(key, attempts){
-  attempts = attempts || 2;
+  attempts = attempts || 3;
   for(let i=0; i<attempts; i++){
     try{
-      const r = await withTimeout(gasGet(key), 5000);
+      const r = await withTimeout(gasGet(key), 9000);
       return (r && r.value) ? JSON.parse(r.value) : [];
     }catch(e){
-      if(i < attempts-1) await new Promise(res=>setTimeout(res, 300));
+      if(i < attempts-1) await new Promise(res=>setTimeout(res, 500));
     }
   }
   return [];
@@ -327,7 +327,7 @@ async function getKeyWithRetry(key, attempts){
 async function reloadFromStorage(){
   if(!storageAvailable){ toast('目前沒有連上 Google Sheet，無法重新讀取', 'err'); return; }
   const keys = ['customers','inventory','treatments','transactions'];
-  const results = await Promise.all(keys.map(k => getKeyWithRetry(k, 3)));
+  const results = await Promise.all(keys.map(k => getKeyWithRetry(k, 4)));
   keys.forEach((k, idx) => { state[k] = results[idx]; });
   renderCustomers(); renderInventory(); renderTreatments(); renderRecords(); renderCheckout();
   toast('✅ 已重新讀取 Google Sheet 資料');
@@ -336,7 +336,7 @@ async function reloadFromStorage(){
 async function saveKey(key){
   if(!storageAvailable) return;
   try{
-    const res = await withTimeout(gasSet(key, JSON.stringify(state[key])), 6000);
+    const res = await withTimeout(gasSet(key, JSON.stringify(state[key])), 9000);
     if(!res || !res.ok) toast('儲存失敗，請重試', 'err');
   }catch(e){
     toast('儲存失敗：' + (e.message || e), 'err');
